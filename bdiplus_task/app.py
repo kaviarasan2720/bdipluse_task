@@ -4,10 +4,10 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from models import db
 from routes import api
 from config import Config
-
+from flask_cors import CORS
 app = Flask(__name__)
 app.config.from_object(Config)
-
+CORS(app)
 db.init_app(app)
 jwt = JWTManager(app)
 
