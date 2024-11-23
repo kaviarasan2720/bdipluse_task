@@ -1,5 +1,5 @@
 # bdipluse_task
-A brief description of what this project does and who it's for
+
 
 
 # User Registration and Authentication System
@@ -36,7 +36,7 @@ The project allows users to register, log in, and access secured resources based
 
 ---
 
-## How to Run the Project Locally
+## How to Run the Back End Project Locally
 
 ### 1. Clone the Repository
 
@@ -98,7 +98,7 @@ By default, the backend will be available at `http://127.0.0.1:5000.`
 | **POST** |`/api/login` |Log in a user|No|
 | **GET** |  `/api/users` |Retrieve all users|Yes|
 | **PUT** | `/api/user/<id>` |Update user information	|Yes|
-| **PUT** | `/api/user/<id>` |Delete a user| Yes|
+| **DELETE** | `/api/user/<id>` |Delete a user| Yes|
 
 ## Running Unit Tests:
 To ensure all endpoints work as expected, run the unit tests:
@@ -107,104 +107,124 @@ pytest test_app.py
 ```
 ### Swagger UI
 Example of the Swagger UI:
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![App Screenshot](https://github.com/kaviarasan2720/bdipluse_task/blob/main/Screenshot%202024-11-23%20140354.png)
 
 
+------
+## Front End Project Locally
 
-
-3. Setup Frontend (ReactJS)
+## Setup Frontend (ReactJS)
 Install Dependencies
-Navigate to the frontend directory:
+## Navigate to the frontend directory:
 
-bash
-Copy code
-cd frontend
-Install dependencies using npm or yarn:
-
+```bash
+npx create-react-app .
+```
 bash
 Copy code
 npm install
-Configure API Base URL
-In the frontend project, configure the Axios instance to use the correct API base URL. Open src/Utils/axiosInstance.js and update the base URL:
+## Configure API Base URL
+In the frontend project, configure the Axios instance to use the correct API base URL. Open ``src/Utils/axiosInstance.js`` and update the base URL:
 
-javascript
-Copy code
+```javascript
+import axios from 'axios';
+
 const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:5000',  // Flask backend URL
+  baseURL: 'http://localhost:5000/api', // Replace with your API base URL
 });
 
-export default axiosInstance;
-Start React Development Server
-To run the React app:
+// Function to set the Authorization header globally
+export const setAuthToken = (token) => {
+  if (token) {
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete axiosInstance.defaults.headers.common['Authorization'];
+  }
+};
 
-bash
-Copy code
+// Add a request interceptor (optional, ensures token is always included)
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Add a response interceptor to handle errors globally (e.g., token expiration)
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('access_token'); // Clear the token
+      window.location.href = '/login'; // Redirect to login
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default axiosInstance;
+
+export default axiosInstance;
+```
+
+Start React Development Server
+
+## To run the React app:
+
+```bash
 npm start
 The frontend will be available at http://localhost:3000.
+```
 
-Testing the APIs
+## Testing the APIs
 API Endpoints
-POST /register: User registration endpoint.
+--
+`POST api/register: User registration endpoint.`
 
-Request Body:
-json
-Copy code
+**Request Body:**
+```json
 {
   "name": "John Doe",
   "email": "john.doe@example.com",
   "password": "password123",
-  "confirmPassword": "password123"
 }
 Response: 201 Created (Success) or error message (e.g., 400 Bad Request for invalid input).
-POST /login: User login endpoint to receive a JWT token.
+```
+--
+`POST api/login: User login endpoint to receive a JWT token.`
 
-Request Body:
-json
-Copy code
+**Request Body:**
+```json
 {
   "email": "john.doe@example.com",
   "password": "password123"
 }
 Response: 200 OK with the JWT token if successful.
-json
-Copy code
+```
+```json
 {
   "access_token": "<jwt-token>"
 }
-GET /profile: Protected route to retrieve user profile information. Requires JWT token in the Authorization header.
-
-Headers:
-makefile
-Copy code
-Authorization: Bearer <jwt-token>
+```
+--
+`GET /api/users: Protected route to retrieve user profile information. Requires JWT token in the Authorization header.`
+**Headers:**
+`Authorization: Bearer <jwt-token>`
 Response: 200 OK with user data.
 UI Screenshots
 Here are some screenshots of the user interface:
 
+
 Registration Screen:
-
+![App Screenshot](https://github.com/kaviarasan2720/bdipluse_task/blob/main/Screenshot%202024-11-23%20135946.png)
 Login Screen:
+![App Screenshot](https://github.com/kaviarasan2720/bdipluse_task/blob/main/Screenshot%202024-11-23%20135926.png)
+CRUD Screen:
+![App Screenshot](https://github.com/kaviarasan2720/bdipluse_task/blob/main/Screenshot%202024-11-23%20212636.png)
+![App Screenshot](https://github.com/kaviarasan2720/bdipluse_task/blob/main/Screenshot%202024-11-23%20212657.png)
+![App Screenshot](https://github.com/kaviarasan2720/bdipluse_task/blob/main/Screenshot%202024-11-23%20212711.png)
 
-User Profile Screen:
-
-Additional Notes
-Ensure that the Flask API is running before starting the React frontend.
-The JWT token from the login response should be stored securely (e.g., in localStorage or sessionStorage) for authentication on protected routes.
-Ensure the PostgreSQL server is running and the database is properly set up as mentioned above.
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-Customizing for Your Own Setup
-Feel free to adjust the backend URLs, database credentials, or other configurations based on your environment.
-
-Flask==2.3.2
-Flask-SQLAlchemy==3.0.2
-Flask-JWT-Extended==4.4.4
-Flask-Cors==3.1.1
-Flask-Swagger-UI==4.1.0
-psycopg2-binary==2.9.6  # PostgreSQL adapter for Python
-pytest==7.1.0
-
-
-
-If you have any questions or need further assistance, feel free to reach out to the project maintainers.
