@@ -65,12 +65,10 @@ pip install -r requirements.txt
 ### 6.Setup PostgreSQL Database:
 ```sql
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,               -- Unique identifier for each user
-    name VARCHAR(100) NOT NULL,          -- User's name
-    email VARCHAR(100) UNIQUE NOT NULL,  -- User's email (must be unique)
-    password_hash TEXT NOT NULL,         -- Hashed password for security
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp of when the user was created
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- Timestamp of the last update
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(120) UNIQUE NOT NULL,
+    password VARCHAR(200) NOT NULL
 );
 ```
 ```SQLALCHEMY_DATABASE_URI = 'postgresql://your_username:your_password@localhost/user_management'```
